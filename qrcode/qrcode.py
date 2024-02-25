@@ -3,15 +3,15 @@ from segno import helpers
 
 def wifi_dict():
 	wifi_settings = {
-		'ssid':'TheOne',
-		'password' :'9hinominal',
+		'ssid':'TheThirdOne',
+		'password' :'@pass#1wd',
 		'security' :'WPA2',
 		}
 	wifi = helpers.make_wifi(**wifi_settings)
 	wifi.save("rssid.png", dark="red", light = "black", scale = 10)
 
 def wifi():
-	qrcode = helpers.make_wifi(ssid='TheOne', password='9hinominal', security='WPA2')
+	qrcode = helpers.make_wifi(ssid='TheThirdOne', password='@pass#1wd', security='WPA2')
 	qrcode.designator
 	'3-M'
 	qrcode.save('bssid.png', scale=10)
@@ -31,7 +31,7 @@ def micro():
 
 def contact():
 	from segno import helpers
-	qrcode = helpers.make_mecard(name='Kahlulu Kahlua', email='Kahlulukahlua@gmail.com', phone='+123456789')
+	qrcode = helpers.make_mecard(name='Khlu Klua', email='Khluklua@gmail.com', phone='+123456789')
 	qrcode.designator
 	'3-L'
 	qrcode.save('contact.png', dark='black', data_dark='orange', scale=8)
