@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>The Event Management Website</title>
+	<link href=
+"https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+		rel="stylesheet">
+</head>
+
+<body class="bg-gray-200 p-8">
+	<div class="max-w-md mx-auto bg-white rounded-md
+				shadow-md overflow-hidden">
+		<div class="p-6">
+			<h1 class="text-2xl font-semibold text-gray-800 mb-4">
+				Event Management
+			</h1>
+			<form id="eventForm" class="mb-4">
+				<label for="eventName" class="block mb-2">
+					Event Name:
+				</label>
+				<input type="text"
+					id="eventName"
+					class="form-input mt-1 block w-full"
+					placeholder="Enter event name"
+					required>
+				<label for="eventDate" class="block mb-2 mt-4">
+					Event Date:
+				</label>
+				<input type="date"
+					id="eventDate"
+					class="form-input mt-1 block w-full" required>
+				<button type="submit"
+						class="mt-4 px-4 py-2 bg-blue-500 text-white
+							rounded hover:bg-blue-600">
+					Add Event
+				</button>
+			</form>
+			<ul id="eventList"></ul>
+		</div>
+	</div>
+	<div id="editModal" class="hidden fixed z-10 inset-0 overflow-y-auto">
+		<div class="flex items-end justify-center 
+					min-h-screen pt-4 px-4 pb-20 
+					text-center sm:block sm:p-0">
+			<div class="fixed inset-0 transition-opacity" aria-hidden="true">
+				<div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+			</div>
+			<span class="hidden sm:inline-block 
+						sm:align-middle sm:h-screen" aria-hidden="true">
+				​
+			</span>
+			<div class="inline-block align-bottom bg-white 
+						rounded-lg text-left overflow-hidden
+						shadow-xl transform transition-all
+						sm:my-8 sm:align-middle sm:max-w-lg
+						sm:w-full">
+				<div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+					<div class="sm:flex sm:items-start">
+						<div class="mx-auto flex-shrink-0 flex
+									items-center justify-center
+									h-12 w-12 rounded-full 
+									bg-green-100 sm:mx-0 sm:h-10
+									sm:w-10">
+							<svg class="h-6 w-6 text-green-600"
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor">
+								<path stroke-linecap="round"
+									stroke-linejoin="round"
+									stroke-width="2"
+									d="M12 6v6m0 0v6m0-6h6m-6 0H6">
+								</path>
+							</svg>
+						</div>
+						<div class="mt-3 text-center sm:mt-0 
+									sm:ml-4 sm:text-left">
+							<h3 class="text-lg leading-6 font-medium 
+									text-gray-900" 
+								id="modalTitle">
+								Edit Event
+							</h3>
+							<div class="mt-2">
+								<input type="text"
+									id="editEventName"
+									class="form-input mt-1 block w-full"
+									placeholder="Enter event name"
+									required>
+								<input type="date"
+									id="editEventDate"
+									class="form-input mt-1 
+											block w-full" 
+									required>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="bg-gray-50 px-4 py-3 
+							sm:px-6 sm:flex sm:flex-row-reverse">
+					<button onclick="saveEdit()"
+							type="button"
+							class="w-full inline-flex justify-center 
+								rounded-md border border-transparent 
+								shadow-sm px-4 py-2 bg-green-600 
+								text-base font-medium text-white 
+								hover:bg-green-700 focus:outline-none
+								focus:ring-2 focus:ring-offset-2 
+								focus:ring-green-500 sm:ml-3 
+								sm:w-auto sm:text-sm">
+						Save Changes
+					</button>
+					<button onclick="closeEditModal()"
+							type="button"
+							class="mt-3 w-full inline-flex justify-center
+								rounded-md border border-gray-300 
+								shadow-sm px-4 py-2 bg-white text-base
+								font-medium text-gray-700 hover:bg-gray-50
+								focus:outline-none focus:ring-2 
+								focus:ring-offset-2 focus:ring-green-500 
+								sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+						Cancel
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		const eventForm = document.getElementById('eventForm');
+		const eventList = document.getElementById('eventList');
+		const editModal = document.getElementById('editModal');
+		const editEventNameInput = document.getElementById('editEventName');
+		const editEventDateInput = document.getElementById('editEventDate');
+		let editIndex = -1;
+
+		eventForm.addEventListener('submit', function (e) {
+			e.preventDefault();
+			const eventName = document.getElementById('eventName')
+				.value;
+			const eventDate = document.getElementById('eventDate')
+				.value;
+			if (eventName.trim() === '' || eventDate === '') {
+				alert('Please enter event name and date.');
+				return;
+			}
+			const listItem = document.createElement('li');
+			listItem.className = 'mb-2';
+			listItem.innerHTML = `
+				<span>Event: ${eventName}, Date: ${eventDate}, </span>
+				<button onclick="openEditModal(${eventList.children.length})"
+						class="px-2 py-1 bg-yellow-500 text-white
+						rounded hover:bg-yellow-600 mr-2">
+						Edit
+						</button>
+				<button onclick="deleteEvent(${eventList.children.length})"
+						class="px-2 py-1 bg-red-500 text-white
+							rounded hover:bg-red-600 mr-2">
+							Delete
+						</button>
+			`;
+			eventList.appendChild(listItem);
+			eventForm.reset();
+		});
+		function openEditModal(index) {
+			editIndex = index;
+			const eventDetails = eventList.children[index]
+				.querySelector('span').textContent.split(', ');
+			const eventName = eventDetails[0].split(': ')[1];
+			const eventDate = eventDetails[1].split(': ')[1];
+			editEventNameInput.value = eventName;
+			editEventDateInput.value = eventDate;
+			editModal.classList.remove('hidden');
+		}
+		function closeEditModal() {
+			editModal.classList.add('hidden');
+		}
+		function saveEdit() {
+			const newName = editEventNameInput.value;
+			const newDate = editEventDateInput.value;
+			eventList.children[editIndex].querySelector('span')
+				.textContent = `Event: ${newName},
+								Date: ${newDate}, `;
+			closeEditModal();
+		}
+		function deleteEvent(index) {
+			eventList.children[index].remove();
+		}
+	</script>
+</body>
+
+</html>
+
+<!-- Firstly, integrate the TailwindCSS with CDN links. Then, Tailwind CSS classes are used for styling elements like bg-gray-200, rounded-md, shadow-md, p-8, etc., provide consistent styling and layout.
+Event listeners are added to the form for submitting event details and to the edit and delete buttons for editing and deleting events, respectively.
+The openEditModal() function opens the edit modal when the edit button is clicked. It populates the modal fields with the selected event details. The closeEditModal() function closes the edit modal. The saveEdit() function saves the edited event details and updates the corresponding list item. The deleteEvent() function removes the selected event from the list.
+The edit modal (editModal) is initially hidden (hidden class) and becomes visible when triggered by the openEditModal() function. It allows users to edit event details such as event name and date. Save and cancel buttons are provided within the modal to save or discard changes, respectively. -->
